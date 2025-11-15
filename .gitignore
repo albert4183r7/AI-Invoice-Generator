@@ -1,0 +1,49 @@
+# =================================================================
+# .gitignore for a MERN Monorepo
+# =================================================================
+
+# 1. Dependencies
+# Ignore all node_modules folders in the entire project
+**/node_modules
+
+# 2. Secrets & Configs (CRITICAL)
+# Ignore all environment files that contain secrets.
+# .env.example IS NOT ignored, as it's a template.
+**/.env
+**/.env.local
+**/.env.development
+**/.env.development.local
+**/.env.test
+**/.env.test.local
+**/.env.production
+**/.env.production.local
+
+# 3. Production & Build Folders
+# Ignore all build output folders
+**/dist
+**/dist-ssr
+**/build
+**/coverage
+
+# 4. Logs
+# Ignore all log files
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 5. Editor & OS Files
+# Ignore IDE and OS-specific files
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# VSCode specific
+.vscode/*
+!.vscode/extensions.json
