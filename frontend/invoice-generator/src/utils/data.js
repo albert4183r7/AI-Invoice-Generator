@@ -78,3 +78,11 @@ export const FAQS = [
     answer: "You can change your account email from your profile settings page."
   }
 ];
+
+// Navigation items configuration
+export const NAVIGATION_MENU = [
+  { id: "dashboard", name: "Dashboard", icon: LayoutDashboard },
+  { id: "invoices", name: "Invoices", icon: FileText },
+  { id: "invoices/new", name: "Create Invoice", icon: Plus },
+  { id: "profile", name: "Profile", icon: Users },
+];
