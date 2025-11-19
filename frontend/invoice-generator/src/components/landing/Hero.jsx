@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom"
 import HERO_IMG from "../../assets/hero-img.png"
+import { useAuth } from "../../context/AuthContext"
 
 const Hero = () => {
-    const isAuthenticated = false;
+    const { isAuthenticated } = useAuth();
+    
     return <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
