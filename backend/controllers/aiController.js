@@ -1,5 +1,5 @@
 const { GoogleGenAI } = require("@google/genai");
-const Invoice = require("../models/invoice");
+const Invoice = require("../models/Invoice");
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 

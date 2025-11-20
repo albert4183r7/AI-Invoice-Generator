@@ -1,4 +1,4 @@
-const Invoice = require("../models/invoice");
+const Invoice = require("../models/Invoice");
 
 // @desc    Create new invoice
 // @route   POST /api/invoices
