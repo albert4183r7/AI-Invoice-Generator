@@ -2,48 +2,74 @@
 
 ## 📘 Overview
 This project aims to build an **AI-powered Invoice Generator** using the **MERN stack (MongoDB, Express.js, React, Node.js)**.
-The system will automate invoice creation and management, leveraging AI to extract key details and generate formatted invoices efficiently.
+The system automates invoice creation and management, leveraging AI to extract key details, generate formatted invoices efficiently, and provide financial insights.
 
 ---
 
 ## 🚀 Tech Stack
-- **Frontend:** React, Tailwind CSS
+- **Frontend:** React, Tailwind CSS v4.1
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB
-- **AI/ML Integration:** (to be added)
+- **AI/ML Integration:** Google Gemini API
 
 ---
 
 ## 📅 Development Progress
 
-### **Week 1**
-#### Frontend
-- ✅ Header component implemented
-  - Added navigation structure and styling.
-  - Integrated responsive design using Tailwind CSS.
+### **Week 1: Project Setup & Landing Page**
+**Focus:** Initializing the frontend and building the public-facing UI.
+- ✅ **Frontend Setup:** Configured React App & Tailwind CSS v4.1.
+- ✅ **Structure:** Defined project files, folders, and application routes.
+- ✅ **Landing Page UI:**
+  - **Header Component:** Responsive navigation.
+  - **Hero Section:** Engaging introduction.
+  - **Features Section:** Highlighting core capabilities.
+  - **Testimonials & FAQ:** Social proof and information.
+  - **Footer Component:** Links and contact info.
 
 ---
 
-### **Week 2**
-#### Frontend
-- ✅ Landing Page completed
-  - Added **Hero section** introducing the product.
-  - Implemented **Features section** showcasing key functionalities.
-  - Added **Testimonials section** for user feedback display.
-  - Included **FAQ section** for common questions.
-  - Designed and built **Footer** with contact and social links.
+### **Week 2: Backend Architecture & API Development**
+**Focus:** Setting up the server, database, and core business logic.
+- ✅ **Server Initialization:** Backend setup and MongoDB connection.
+- ✅ **Database Schemas:** Created Mongoose models for **Users** and **Invoices**.
+- ✅ **Authentication:** Built Auth Middleware and APIs (Login, Signup, Get Profile).
+- ✅ **Invoice APIs:** Developed CRUD endpoints (Create, Get All, Get by ID, Update, Delete).
+- ✅ **AI Backend Logic:**
+  - Built endpoints for **AI Invoice Creation** (Parse Text).
+  - Built endpoints for **AI Reminder Emails**.
+  - Built endpoints for **AI Dashboard Insights**.
 
 ---
 
-### **Week 3**
-#### Backend
-- ✅ Initialized Node.js/Express backend with project structure.
-- ✅ Established connection to MongoDB database.
-- ✅ Created database schemas for **User** and **Invoice** models.
-- ✅ Built secure authentication APIs (register, login) using **JWT**.
-- ✅ Implemented authentication middleware for protecting routes.
-- ✅ Developed core **CRUD APIs** for invoice management.
-- ✅ Defined initial API endpoints for future AI integration.
+### **Week 3: Client-Side Authentication & Dashboard Core**
+**Focus:** Connecting frontend to backend and building the secure dashboard.
+- ✅ **API Integration:** Defined API endpoints and configured Axios instance.
+- ✅ **State Management:** Set up **Auth Context** for user session management.
+- ✅ **Authentication UI:**
+  - Created fully functional **Login Page**.
+  - Created fully functional **Signup Page**.
+  - Implemented secure **Dashboard Layout**.
+- ✅ **Dashboard Features:**
+  - Built the main **Dashboard Page** overview.
+  - Implemented **Recent Invoices Section**.
+
+---
+
+### **Week 4: Advanced Features, AI UI & Final Polish**
+**Focus:** Implementing complex forms, AI components, and finishing touches.
+- ✅ **Smart Analytics:** Integrated **AI Insights Card** on the dashboard.
+- ✅ **Invoice Management:**
+  - Built **Create Invoice Page** with reusable form inputs.
+  - Built **All Invoices Page** with filtering.
+  - Implemented functions to **Delete** and **Update Status**.
+- ✅ **AI Features UI:**
+  - Built **"Create with AI" Component** (Text-to-Invoice).
+  - Built **"Generate Reminder Email" Component**.
+- ✅ **Final Details:**
+  - Created **Invoice Detail Page**.
+  - Implemented **Print & Download PDF** functionality.
+  - Completed **Profile Info Page** for business details.
 
 ---
 
@@ -66,7 +92,7 @@ The system will automate invoice creation and management, leveraging AI to extra
     # Create your local environment file from the template
     cp .env.example .env 
     
-    # Open the .env file and add your secret keys (DB_URI, JWT_SECRET, etc.)
+    # Open the .env file and add your secret keys (DB_URI, JWT_SECRET, GEMINI_API_KEY, etc.)
     
     # Run the backend server
     npm start 
