@@ -22,7 +22,7 @@ const CreateWithAIModal = ({isOpen, onClose}) => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.post(API_PATHS.AI.PARSE_INVOICE_TEXT, { text });
-      const invoiceData = response.data;
+      const invoiceData = response.data.parsedData;
       
       toast.success('Invoice data extracted successfully!');
       onClose();
