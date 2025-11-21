@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Briefcase, LogOut, Menu, X } from "lucide-react";
+import { FileText, LogOut, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import ProfileDropdown from "./ProfileDropdown";
@@ -96,7 +96,7 @@ const DashboardLayout = ({ children, activeMenu }) => {
         <div className="flex items-center h-16 border-b border-gray-200 px-6">
           <Link className="flex items-center space-x-3" to="/dashboard">
             <div className="h-10 w-10 bg-gradient-to-br from-blue-950 to-blue-800 rounded-2xl flex items-center justify-center">
-              <Briefcase className="h-5 w-5 text-white" />
+              <FileText className="h-5 w-5 text-white" />
             </div>
             {!sidebarCollapsed && (
               <span className="text-gray-900 font-extrabold text-2xl">

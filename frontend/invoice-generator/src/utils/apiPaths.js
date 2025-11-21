@@ -1,5 +1,5 @@
 // src/utils/apiPaths.js
-export const BASE_URL = "http://localhost:8000";
+export const BASE_URL = "https://ai-invoice-generator-backend-j0x8.onrender.com";
 
 export const API_PATHS = {
   AUTH: {
