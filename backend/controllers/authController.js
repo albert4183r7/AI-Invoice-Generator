@@ -96,13 +96,30 @@ exports.getMe = async (req, res) => {
 // @access  Private
 exports.updateUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        // Select password to verify old password if needed
+        const user = await User.findById(req.user.id).select('+password');
 
         if (user) {
             user.name = req.body.name || user.name;
             user.businessName = req.body.businessName || user.businessName;
             user.address = req.body.address || user.address;
             user.phone = req.body.phone || user.phone;
+
+            // Handle Password Change Logic
+            if (req.body.password) {
+                // 1. Check if user provided a new password that is different from current
+                // Note: In a real app, comparing hashes directly isn't always reliable due to salting,
+                // but matchPassword compares plaintext input to stored hash.
+                // To check if "new password is same as old", we check if the NEW password matches the OLD hash.
+                
+                const isSamePassword = await user.matchPassword(req.body.password);
+                if (isSamePassword) {
+                     return res.status(400).json({ message: 'New password cannot be the same as the current password.' });
+                }
+                
+                // If valid, update password (pre-save hook will hash it)
+                user.password = req.body.password;
+            }
 
             const updateUserProfile = await user.save();
 
