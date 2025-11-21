@@ -1,7 +1,7 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FileText, Menu, X } from "lucide-react";
-import ProfileDropdown from "../layout/ProfileDropDown";
+import ProfileDropdown from "../layout/ProfileDropdown";
 import { useNavigate } from "react-router-dom";
 import Button from "../ui/Button";
 import { useAuth } from "../../context/AuthContext";
@@ -90,7 +90,8 @@ const Header = () => {
                             </>
                         )}
                     </div>
-                    <div className="">
+                    {/* Hamburger Icon - Visible only on mobile/tablet */}
+                    <div className="lg:hidden">
                         <button 
                             onClick={() => setIsMenuOpen(!isMenuOpen)} 
                             className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"

@@ -32,7 +32,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-blue-950 rounded-md flex items-center justify-center">
                 <FileText className="w-4 h-4 text-white" />
               </div>
-              <span className="text-xl font-bold">AI Invoice App</span>
+              <span className="text-xl font-bold">PromptBill</span>
             </Link>
             <p className="text-gray-400 leading-relaxed max-w-sm">
               The simplest way to create and send polished invoices — fast.
@@ -74,7 +74,7 @@ const Footer = () => {
         <div className="border-t border-gray-800 py-8 mt-16">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400">
-              &copy; 2025 AI Invoice App. All rights reserved.
+              &copy; 2025 PromptBill. All rights reserved.
             </p>
             <div className="flex space-x-4">
               <SocialLink href="#">
