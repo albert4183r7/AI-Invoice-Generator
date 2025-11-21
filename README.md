@@ -1,4 +1,4 @@
-# 🧾 AI-powered Invoice Generator (MERN Stack)
+# 🧾 PromptBill: AI-powered Invoice Generator (MERN Stack)
 
 ## 📘 Overview
 This project aims to build an **AI-powered Invoice Generator** using the **MERN stack (MongoDB, Express.js, React, Node.js)**.
