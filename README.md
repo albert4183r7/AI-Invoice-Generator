@@ -7,7 +7,7 @@ The system automates invoice creation and management, leveraging AI to extract k
 ---
 
 ## 🚀 Tech Stack
-- **Frontend:** React, Tailwind CSS v4.1
+- **Frontend:** React, Tailwind CSS
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB
 - **AI/ML Integration:** Google Gemini API
@@ -18,7 +18,7 @@ The system automates invoice creation and management, leveraging AI to extract k
 
 ### **Week 1: Project Setup & Landing Page**
 **Focus:** Initializing the frontend and building the public-facing UI.
-- ✅ **Frontend Setup:** Configured React App & Tailwind CSS v4.1.
+- ✅ **Frontend Setup:** Configured React App & Tailwind CSS
 - ✅ **Structure:** Defined project files, folders, and application routes.
 - ✅ **Landing Page UI:**
   - **Header Component:** Responsive navigation.
@@ -95,7 +95,7 @@ The system automates invoice creation and management, leveraging AI to extract k
     # Open the .env file and add your secret keys (DB_URI, JWT_SECRET, GEMINI_API_KEY, etc.)
     
     # Run the backend server
-    npm start 
+    npm run dev
     ```
 
 3.  **Set up Frontend**
@@ -108,7 +108,7 @@ The system automates invoice creation and management, leveraging AI to extract k
     npm install
 
     # Run the frontend development server
-    npm start
+    npm run dev
     ```
 
-Your backend will now be running (usually on `http://localhost:8000`) and your frontend will be running (usually on `http://localhost:3000`).
+Your backend will now be running (usually on `http://localhost:8000`) and your frontend will be running (usually on `http://localhost:5173`).
