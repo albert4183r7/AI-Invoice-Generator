@@ -83,11 +83,21 @@ const generateReminderEmail = async (req, res) => {
 
         Use the following details to personalize the email:
         - Client Name: ${invoice.billTo.clientName}
+        - Client Email: ${invoice.billTo.email || "[Client Email]"}
         - Invoice Number: ${invoice.invoiceNumber}
         - Amount Due: $${invoice.total.toFixed(2)}
         - Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}
+        - Business Name: ${invoice.billFrom.businessName}
 
-        The tone should be friendly but clear. Keep it concise. Start the email with "Subject:".
+        The output must be strictly formatted as follows:
+        To: [Client Email]
+        Subject: [Subject Line]
+        Message Body:
+        [Email Body Content]
+
+        Sign the email with the [Your Name] placeholder and Business Name.
+
+        The tone should be friendly but clear.
         `;
 
         const response = await ai.models.generateContent({
@@ -95,7 +105,11 @@ const generateReminderEmail = async (req, res) => {
             contents: prompt,
         });
 
-        res.status(200).json({ reminderText: response.text });
+        // Return both the generated text AND the client email found in the invoice
+        res.status(200).json({ 
+            reminderText: response.text,
+            clientEmail: invoice.billTo.email || "" 
+        });
     } catch ( error ) {
         console.error("Error generate reminder with AI:", error);
         res.status(500).json({ message: "Failed to parse invoice data from text", details: error.message });
