@@ -11,7 +11,7 @@ export const FEATURES = [
     icon: BarChart2,
     title: "Insights Dashboard",
     description:
-      "Get smart, actionable insights about your business finances, generated automatically by Aurora.",
+      "Get smart, actionable insights about your business finances, generated automatically by PromptBill.",
   },
   {
     icon: Mail,
@@ -50,8 +50,8 @@ export const TESTIMONIALS = [
 
 export const FAQS = [
   {
-    question: "How does Aurora create invoices?",
-    answer: "Simply paste any text that contains invoice details—like an email, a list of items, or a work summary—and Aurora will parse it to pre-fill a new invoice for you, saving time and effort."
+    question: "How does PromptBill create invoices?",
+    answer: "Simply paste any text that contains invoice details—like an email, a list of items, or a work summary—and PromptBill will parse it to pre-fill a new invoice for you, saving time and effort."
   },
   {
     question: "Is there a free trial available?",
