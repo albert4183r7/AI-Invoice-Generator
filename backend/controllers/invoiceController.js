@@ -17,24 +17,34 @@ exports.createInvoice = async (req, res) => {
             paymentTerms,
         } = req.body;
 
-        // subtotal calculation
+        // Calculate totals
         let subtotal = 0;
         let taxTotal = 0;
-        items.forEach(item => {
-            subtotal += item.unitPrice * item.quantity;
-            taxTotal += ((item.unitPrice * item.quantity) * (item.taxPercent || 0)) / 100;
+        
+        // FIX: Map over items to calculate and ADD the 'total' field to each item object
+        const processedItems = items.map(item => {
+            const itemTotal = item.unitPrice * item.quantity;
+            const itemTax = (itemTotal * (item.taxPercent || 0)) / 100;
+            
+            subtotal += itemTotal;
+            taxTotal += itemTax;
+
+            return {
+                ...item,
+                total: itemTotal // Add the required total field
+            };
         });
 
         const total = subtotal + taxTotal;
 
         const invoice = new Invoice({
-            user,
+            user: user._id || user.id, // Ensure we extract the ID string
             invoiceNumber,
             invoiceDate,
             dueDate,
             billFrom,
             billTo,
-            items,
+            items: processedItems, // Use the processed items with totals
             notes,
             paymentTerms,
             subtotal,
@@ -54,7 +64,9 @@ exports.createInvoice = async (req, res) => {
 // @access  Private
 exports.getInvoices = async (req, res) => {
     try {
-        const invoices = await Invoice.find({user: req.user.id}).populate('user', 'name email');
+        // Handle both _id (mongoose object) and id (JWT payload)
+        const userId = req.user._id || req.user.id;
+        const invoices = await Invoice.find({user: userId}).populate('user', 'name email');
         res.json(invoices);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching invoices', error: error.message });
@@ -69,8 +81,10 @@ exports.getInvoiceById = async (req, res) => {
         const invoice = await Invoice.findById(req.params.id).populate('user', 'name email');
         if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
         
+        const userId = req.user._id || req.user.id;
+        
         // Check if the invoice belongs to the user
-        if (invoice.user.id.toString() !== req.user.id) {
+        if (invoice.user._id.toString() !== userId.toString()) {
             return res.status(401).json({ message: 'Not Authorized' });
         }
         
@@ -97,13 +111,20 @@ exports.updateInvoice = async (req, res) => {
             status,
         } = req.body;
 
-        // recalculate totals if items changed
+        // Recalculate totals if items changed
         let subtotal = 0;
         let taxTotal = 0;
+        let processedItems = items;
+
         if (items && items.length > 0) {
-            items.forEach((item) => {
-                subtotal += item.unitPrice * item.quantity;
-                taxTotal += ((item.unitPrice * item.quantity) * (item.taxPercent || 0)) / 100;
+            processedItems = items.map(item => {
+                const itemTotal = item.unitPrice * item.quantity;
+                const itemTax = (itemTotal * (item.taxPercent || 0)) / 100;
+                
+                subtotal += itemTotal;
+                taxTotal += itemTax;
+
+                return { ...item, total: itemTotal };
             });
         }
         
@@ -117,7 +138,7 @@ exports.updateInvoice = async (req, res) => {
                 dueDate,
                 billFrom,
                 billTo,
-                items,
+                items: processedItems,
                 notes,
                 paymentTerms,
                 status,
@@ -132,9 +153,7 @@ exports.updateInvoice = async (req, res) => {
 
         res.json(updatedInvoice);
     } catch (error) {
-        res
-        .status(500)
-        .json({ message: 'Error updating invoice', error: error.message });
+        res.status(500).json({ message: 'Error updating invoice', error: error.message });
     }
 };
 
