@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    # Load variables from your local .env file
+    env_file:
+      - ./backend/.env
+    environment:
+      - PORT=5000
+      # OVERRIDE the MONGO_URI from .env because inside Docker, 
+      # the database is at 'mongo', not 'localhost'
+      - MONGO_URI=mongodb://mongo:27017/invoice_db
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./frontend/invoice-generator
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
