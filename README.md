@@ -11,6 +11,7 @@ The system automates invoice creation and management, leveraging AI to extract k
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB
 - **AI/ML Integration:** Google Gemini API
+- **DevOps:** Docker, Jenkins
 
 ---
 
@@ -73,7 +74,7 @@ The system automates invoice creation and management, leveraging AI to extract k
 
 ---
 
-## 🛠️ Installation & Setup (for local development)
+## 🛠️ Installation & Setup (Manual Local Development)
 
 1.  **Clone the repository**
     ```bash
@@ -112,3 +113,44 @@ The system automates invoice creation and management, leveraging AI to extract k
     ```
 
 Your backend will now be running (usually on `http://localhost:8000`) and your frontend will be running (usually on `http://localhost:5173`).
+
+---
+
+## 🐳 Docker & CI/CD Setup
+
+This project is configured for containerized deployment using Docker and automated CI/CD via Jenkins.
+
+### **1. Running with Docker Compose**
+
+You can run the entire stack (Frontend, Backend, and MongoDB) with a single command. This is ideal for testing the production build locally.
+
+**Prerequisites:**
+* Docker Desktop installed.
+* **Important:** You must create a `.env` file in the `backend/` directory. Use `.env.examples` as a reference.
+
+**Steps:**
+1.  Navigate to the project root.
+2.  Run the following command:
+    ```bash
+    docker-compose up --build
+    ```
+3.  Access the application:
+    * **Frontend:** `http://localhost:80`
+    * **Backend API:** `http://localhost:5000`
+    * **Database:** `mongodb://localhost:27017`
+
+### **2. Jenkins CI/CD Pipeline**
+
+A `Jenkinsfile` is included to automate testing, building, and pushing Docker images to Docker Hub.
+
+**Pipeline Workflow:**
+1.  **Checkout:** Pulls the latest code from the repository.
+2.  **Install Dependencies:** Installs npm packages for both frontend and backend.
+3.  **Test:** Runs backend (`npm test`) and frontend (`npm run test:unit`) unit tests.
+4.  **Build & Push:** Builds Docker images and pushes them to Docker Hub using the build number as a tag.
+5.  **Deploy:** (Simulated) Runs `docker-compose up` to deploy the updated containers.
+
+**Jenkins Configuration:**
+* Ensure the `NodeJS` and `Docker Pipeline` plugins are installed.
+* Add your Docker Hub credentials in Jenkins with the ID `docker-hub-credentials`.
+* Configure a new Pipeline job pointing to this repository's `Jenkinsfile`.
