@@ -1,12 +1,15 @@
 // src/utils/apiPaths.js
-export const BASE_URL = "http://localhost:8000";
+
+// 1. Try to get the URL from Vite Environment Variable
+// 2. Fallback to localhost if not set (useful for local non-docker dev)
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export const API_PATHS = {
   AUTH: {
-    REGISTER: "/api/auth/register", // Signup
-    LOGIN: "/api/auth/login", // Authenticate user & return JWT token
-    GET_PROFILE: "/api/auth/me", // Get logged-in user details
-    UPDATE_PROFILE: "/api/auth/me", // Update profile details (PUT)
+    REGISTER: "/api/auth/register",
+    LOGIN: "/api/auth/login",
+    GET_PROFILE: "/api/auth/me",
+    UPDATE_PROFILE: "/api/auth/me",
   },
   INVOICE: {
     CREATE: "/api/invoices/",
