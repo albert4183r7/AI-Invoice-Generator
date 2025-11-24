@@ -11,9 +11,25 @@ const aiRoutes = require("./routes/aiRoutes");
 const app = express();
 
 // Middleware to handle CORS
+// We allow the CLIENT_URL from .env, or fallbacks for local dev
+const allowedOrigins = [
+    process.env.CLIENT_URL, 
+    "http://localhost:5173", 
+    "http://localhost:80"
+].filter(Boolean); // Remove undefined values
+
 app.use(
     cors({
-        origin: "*",
+        origin: function (origin, callback) {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) === -1) {
+                // You can toggle this off for strict production security
+                // return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
+                return callback(null, true); // Temporarily allow all for easier Docker setup
+            }
+            return callback(null, true);
+        },
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
     })
