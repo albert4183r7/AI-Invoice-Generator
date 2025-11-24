@@ -1,34 +1,38 @@
-version: '3.8'
-
 services:
+  # 1. The Backend API
   backend:
     build: ./backend
     ports:
       - "5000:5000"
-    # Load variables from your local .env file
+    # TELL DOCKER TO LOOK IN THE BACKEND FOLDER FOR VARIABLES
     env_file:
       - ./backend/.env
     environment:
+      # We can override or add specific docker settings here if needed
       - PORT=5000
-      # OVERRIDE the MONGO_URI from .env because inside Docker, 
-      # the database is at 'mongo', not 'localhost'
-      - MONGO_URI=mongodb://mongo:27017/invoice_db
-    depends_on:
-      - mongo
+      # Ensure your .env in backend has the MONGO_URI for Atlas
+    networks:
+      - app-network
 
+  # 2. The Frontend (React)
   frontend:
-    build: ./frontend/invoice-generator
+    build:
+      context: ./frontend/invoice-generator
+      dockerfile: Dockerfile
+      args:
+        # Since we are running locally, we hardcode the internal docker URL
+        # or the localhost URL depending on how you access it.
+        # For browser access, use localhost.
+        - VITE_API_BASE_URL=http://localhost:5000
     ports:
       - "80:80"
     depends_on:
       - backend
+    networks:
+      - app-network
 
-  mongo:
-    image: mongo:6
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+# NO database service here because you are using Atlas!
 
-volumes:
-  mongo-data:
+networks:
+  app-network:
+    driver: bridge
