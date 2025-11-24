@@ -31,8 +31,6 @@ services:
     networks:
       - app-network
 
-# NO database service here because you are using Atlas!
-
 networks:
   app-network:
     driver: bridge

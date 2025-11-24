@@ -1,7 +1,3 @@
-// src/utils/apiPaths.js
-
-// 1. Try to get the URL from Vite Environment Variable
-// 2. Fallback to localhost if not set (useful for local non-docker dev)
 export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export const API_PATHS = {
