@@ -8,11 +8,29 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      # We can override or add specific docker settings here if needed
       - PORT=5000
       # Ensure your .env in backend has the MONGO_URI for Atlas
     networks:
       - app-network
+    restart: unless-stopped
+    # Give the app time to drain in-flight requests before Docker sends
+    # SIGKILL. Must be greater than SHUTDOWN_TIMEOUT_MS in server.js.
+    stop_grace_period: 30s
+    # The image's own HEALTHCHECK (see backend/Dockerfile) drives the
+    # service_healthy condition the frontend waits on below.
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # 2. The Frontend (React)
   frontend:
@@ -20,17 +38,76 @@ services:
       context: ./frontend/invoice-generator
       dockerfile: Dockerfile
       args:
-        # Since we are running locally, we hardcode the internal docker URL
-        # or the localhost URL depending on how you access it.
-        # For browser access, use localhost.
+        # Compiled into the bundle at build time -- for browser access, use
+        # the host-reachable URL, not the internal Docker service name.
         - VITE_API_BASE_URL=http://localhost:5000
+    # The unprivileged nginx image listens on 8080 internally.
     ports:
-      - "80:80"
+      - "80:8080"
     depends_on:
-      - backend
+      backend:
+        # Wait for the API to actually pass its healthcheck rather than just
+        # for the container to have started.
+        condition: service_healthy
     networks:
       - app-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+
+  # 3. Metrics storage. Scrapes the API's /metrics endpoint on an interval and
+  #    retains the series; Grafana reads from it.
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - app-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # 4. Dashboards. Provisioned from files on disk, so the dashboard definition
+  #    is version-controlled rather than clicked together in the UI.
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      # Anonymous access makes the dashboard viewable without a login, which
+      # is what you want for a public demo and never what you want otherwise.
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - app-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:
