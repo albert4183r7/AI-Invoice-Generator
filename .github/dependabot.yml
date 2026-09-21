@@ -1,0 +1,39 @@
+version: 2
+updates:
+  # Application dependencies
+  - package-ecosystem: npm
+    directory: /backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      backend-non-major:
+        patterns: ['*']
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /frontend/invoice-generator
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      frontend-non-major:
+        patterns: ['*']
+        update-types: [minor, patch]
+
+  # Base images -- these carry OS-level CVEs that npm audit won't tell you about
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: docker
+    directory: /frontend/invoice-generator
+    schedule:
+      interval: weekly
+
+  # Keep the pipeline itself patched
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

@@ -1,0 +1,34 @@
+# Keep secrets and local state out of the image entirely.
+# `.gitignore` protects the repository; this file protects the image.
+# Without it, `COPY . .` bakes a developer's local .env into the layer cache,
+# where secrets remain recoverable via `docker history` even if deleted later.
+
+# Dependencies (the image installs its own via `npm ci`)
+node_modules
+
+# Secrets & local config
+.env
+.env.*
+
+# Tests & coverage are not needed in a production runtime image
+tests
+coverage
+jest.config.js
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docs & editor noise
+*.md
+.vscode
+.idea
+.DS_Store
+
+# Container plumbing
+Dockerfile
+.dockerignore
+
+# Version control
+.git
+.gitignore

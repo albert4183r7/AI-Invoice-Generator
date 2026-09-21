@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
+// The provider and its consumer hook intentionally live together -- every
+// call site imports `useAuth` from this module, and splitting them apart would
+// mean touching nine files to satisfy an HMR-only lint rule.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

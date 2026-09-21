@@ -1,0 +1,19 @@
+global:
+  # How often to collect from each target. 15s is the usual starting point --
+  # fast enough to see a problem developing, cheap enough to keep retention
+  # reasonable.
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: invoice-api
+    metrics_path: /metrics
+    static_configs:
+      # "backend" is the compose service name, resolved by Docker's internal DNS.
+      - targets: ['backend:5000']
+
+  # Prometheus scraping itself. Useful for telling "the API is down" apart from
+  # "the monitoring is down".
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
