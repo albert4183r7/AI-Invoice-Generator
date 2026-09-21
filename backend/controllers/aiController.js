@@ -1,5 +1,6 @@
 const { GoogleGenAI } = require("@google/genai");
 const Invoice = require("../models/Invoice");
+const logger = require("../logger");
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -59,7 +60,7 @@ const parseInvoiceFromText = async (req, res) => {
 
     res.status(200).json({ parsedData });
     } catch (error) {
-        console.error("Error parsing invoice with AI:", error);
+        logger.error({ err: error }, "failed to parse invoice from text");
         res.status(500).json({ message: "Failed to parse invoice data from text", details: error.message });
     }
 };
@@ -111,7 +112,7 @@ const generateReminderEmail = async (req, res) => {
             clientEmail: invoice.billTo.email || "" 
         });
     } catch ( error ) {
-        console.error("Error generate reminder with AI:", error);
+        logger.error({ err: error }, "failed to generate reminder email");
         res.status(500).json({ message: "Failed to parse invoice data from text", details: error.message });
     }
 };
@@ -166,7 +167,7 @@ const getDashboardSummary = async (req, res) => {
 
         res.status(200).json(parsedData);
     } catch ( error ) {
-        console.error("Error dashboard summary with AI:", error);
+        logger.error({ err: error }, "failed to generate dashboard summary");
         res.status(500).json({ message: "Failed to parse invoice data from text", details: error.message });
     }
 };
