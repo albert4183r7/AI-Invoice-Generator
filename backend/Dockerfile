@@ -1,5 +1,5 @@
 # Use official Node.js image
-FROM node:20-alpine
+FROM node:26-alpine
 
 # Bake in production mode so the logger emits JSON rather than starting the
 # pino-pretty transport (which is a dev-only dependency).
