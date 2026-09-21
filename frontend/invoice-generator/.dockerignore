@@ -1,0 +1,36 @@
+# Keep secrets, local state and dev-only tooling out of the image.
+# `.gitignore` protects the repository; this file protects the image.
+
+# Dependencies (the image installs its own via `npm ci`)
+node_modules
+
+# Build output is produced inside the image; never copy a stale local one
+dist
+dist-ssr
+coverage
+
+# Secrets & local config
+.env
+.env.*
+
+# E2E tooling is not needed to produce a static bundle
+cypress
+cypress.config.js
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docs & editor noise
+*.md
+.vscode
+.idea
+.DS_Store
+
+# Container plumbing
+Dockerfile
+.dockerignore
+
+# Version control
+.git
+.gitignore
