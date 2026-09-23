@@ -104,17 +104,17 @@ const Login = () => {
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, formData);
 
       if (response.status === 200) {
-        const { token } = response.data;
+        setSuccess("Login successful");
 
-        if (token) {
-          setSuccess("Login successful");
-          login(response.data, token);
+        // The session cookie is set on this same response, so there is no
+        // token for the client to hold on to.
+        login(response.data);
 
-          // Redirect based on role
-          setTimeout(() => {
-            window.location.href = "/dashboard";
-          }, 2000);
-        }
+        // Brief confirmation, then client-side navigation. The full page
+        // reload this used to do discarded all SPA state for no reason.
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+        }, 800);
       } else {
         setError(response.data.message || "Invalid credentials");
       }

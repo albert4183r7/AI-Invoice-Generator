@@ -39,9 +39,11 @@ const CreateInvoice = ({existingInvoice, onSave}) => {
     !existingInvoice
   );
 
-  useEffect(() => {
-    const aiData = location.state?.aiData;
+  // Read outside the effect so it can be listed as a dependency without the
+  // optional-chain expression changing identity on every render.
+  const aiData = location.state?.aiData;
 
+  useEffect(() => {
     if (aiData) {
       setFormData((prev) => ({
         ...prev,
@@ -89,7 +91,7 @@ const CreateInvoice = ({existingInvoice, onSave}) => {
       };
       generateNewInvoiceNumber();
     }
-  }, [existingInvoice]);
+  }, [existingInvoice, aiData]);
 
   const handleInputChange = (e, section, index) => {
     const { name, value } = e.target;
@@ -134,9 +136,13 @@ const CreateInvoice = ({existingInvoice, onSave}) => {
     e.preventDefault();
     setLoading(true);
 
+    // Each line's total is pre-tax, matching what the API stores (it derives
+    // the tax into a separate `taxTotal`). Including tax here made the row
+    // total disagree with the same row after saving, and made the rows stop
+    // adding up to the Subtotal printed beneath them.
     const itemsWithTotal = formData.items.map((item) => ({
       ...item,
-      total: (item.quantity || 0) * (item.unitPrice || 0) * (1 + (item.taxPercent || 0) / 100),
+      total: (item.quantity || 0) * (item.unitPrice || 0),
     }));
     const finalFormData = { ...formData, items: itemsWithTotal, subtotal, taxTotal, total };
 
@@ -189,9 +195,14 @@ const CreateInvoice = ({existingInvoice, onSave}) => {
         <div className="bg-white p-6 rounded-lg shadow-sm shadow-gray-100 border border-slate-200 space-y-4">
           <h3 className="text-lg font-semibold text-slate-900 mb-2">Bill To</h3>
           <InputField label="Client Name" name="clientName" value={formData.billTo.clientName} onChange={(e) => handleInputChange(e, "billTo")} />
-          <InputField label="Client Email" type="email" name="email" value={formData.billTo.email} onChange={(e) => handleInputChange(e, "billTo")} />
-          <TextareaField label="Client Address" name="address" value={formData.billTo.address} onChange={(e) => handleInputChange(e, "billTo")} />
-          <InputField label="Client Phone" name="phone" value={formData.billTo.phone} onChange={(e) => handleInputChange(e, "billTo")} />
+          {/* `id` is distinct from `name` on these three: Bill From above uses
+              the same three field names, so sharing them would give the page
+              duplicate DOM ids and send each "Client ..." label to the wrong
+              input. The handler routes by the section argument, so `name` has
+              to stay as it is. */}
+          <InputField label="Client Email" type="email" name="email" id="clientEmail" value={formData.billTo.email} onChange={(e) => handleInputChange(e, "billTo")} />
+          <TextareaField label="Client Address" name="address" id="clientAddress" value={formData.billTo.address} onChange={(e) => handleInputChange(e, "billTo")} />
+          <InputField label="Client Phone" name="phone" id="clientPhone" value={formData.billTo.phone} onChange={(e) => handleInputChange(e, "billTo")} />
         </div>
       </div>
 
@@ -226,7 +237,7 @@ const CreateInvoice = ({existingInvoice, onSave}) => {
                   <td className="px-2 sm:px-6 py-4">
                     <input type="number" name="taxPercent" value={item.taxPercent} onChange={(e) => handleInputChange(e, null, index)} className="w-full h-10 px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0"/>
                   </td>
-                  <td className="px-2 sm:px-6 py-4 text-sm text-slate-500">${((item.quantity || 0) * (item.unitPrice || 0) * (1 + (item.taxPercent || 0) / 100)).toFixed(2)}</td>
+                  <td className="px-2 sm:px-6 py-4 text-sm text-slate-500">${((item.quantity || 0) * (item.unitPrice || 0)).toFixed(2)}</td>
                   <td className="px-2 sm:px-6 py-4">
                     <Button type="button" variant="ghost" size="small" onClick={() => handleRemoveItem(index)}>
                       <Trash2 className="w-4 h-4 text-red-500" />

@@ -17,7 +17,11 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await mongoose.disconnect();
-  await mongoServer.stop();
+
+  // Guarded: if beforeAll threw (a failed binary download, say) mongoServer is
+  // undefined, and calling .stop() on it would replace the real error with a
+  // TypeError from afterAll.
+  if (mongoServer) await mongoServer.stop();
 });
 
 describe('Health endpoints', () => {

@@ -1,14 +1,20 @@
-import {Navigate, Outlet} from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import DashboardLayout from '../layout/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 
 const ProtectedRoute = ({children}) => {
-    // will integrate these values later
     const { isAuthenticated, loading } = useAuth();
 
     if (loading) {
-        // You can replace this with a loading spinner or skeleton
-        return <div>Loading...</div>;
+        // Shown while the session is confirmed against GET /api/auth/me. The
+        // cookie is httpOnly, so the server is the only thing that can answer
+        // whether the visitor is signed in.
+        return (
+            <div className="flex h-screen items-center justify-center bg-slate-50">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+        );
     }
 
     if (!isAuthenticated) {

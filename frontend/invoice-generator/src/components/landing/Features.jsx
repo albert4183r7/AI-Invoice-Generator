@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react"
 import { FEATURES } from "../../utils/data"
+import ComingSoonLabel from "../ui/ComingSoonLabel"
 
 const Features = () => {
   return (
@@ -19,9 +20,13 @@ const Features = () => {
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
                         <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-                        <a href="#" className="inline-flex items-center text-blue-900 font-medium mt-4 hover:text-black transition-colors duration-200">
+                        {/* There is no per-feature page to link to, so this is
+                            marked as coming soon rather than left as href="#",
+                            which jumped the viewport to the top of the page and
+                            navigated nowhere. */}
+                        <ComingSoonLabel className="mt-4">
                             Learn More <ArrowRight className="w-4 h-4 ml-2" />
-                        </a>
+                        </ComingSoonLabel>
                     </div>
                 ))}
             </div>

@@ -20,7 +20,10 @@ const mockInvoices = [
         _id: '2',
         invoiceNumber: 'INV-002',
         total: 500,
-        status: 'Pending',
+        // 'Unpaid', not 'Pending': the API's schema only allows Paid/Unpaid,
+        // so a 'Pending' fixture was asserting against a state the backend
+        // cannot produce.
+        status: 'Unpaid',
         invoiceDate: new Date().toISOString(),
         billTo: { clientName: 'Client B' }
     }

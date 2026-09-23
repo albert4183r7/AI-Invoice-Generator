@@ -3,6 +3,7 @@ require('dotenv').config();
 const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const pinoHttp = require('pino-http');
@@ -107,8 +108,16 @@ app.use(
         },
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization'],
+        // The session travels in a cookie, so the browser only sends it when
+        // the request is explicitly credentialed. This requires a concrete
+        // origin above -- the wildcard is not permitted alongside it.
+        credentials: true,
     })
 );
+
+// Populates req.cookies, which is where protect() looks for the session
+// token. Must run before any route that authenticates.
+app.use(cookieParser());
 
 app.use(express.json({ limit: '1mb' }));
 

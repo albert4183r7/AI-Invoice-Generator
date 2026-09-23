@@ -43,7 +43,7 @@ const CreateWithAIModal = ({isOpen, onClose}) => {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4 text-center">
-        <div className="fixed inset-0 bg-black/10 bg-opacity-50 transition-opacity" onClick={onClose}></div>
+        <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={onClose}></div>
         
         <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 relative text-left transform transition-all">
           <div className="flex items-center justify-between mb-4">

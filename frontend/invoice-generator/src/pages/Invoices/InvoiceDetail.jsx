@@ -105,9 +105,9 @@ const InvoiceDetail = () => {
             <div className="text-left sm:text-right mt-4 sm:mt-0">
               <p className="text-sm text-slate-500">Status</p>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                invoice.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : 
-                invoice.status === 'Pending' ? 'bg-amber-100 text-amber-800' : 
-                'bg-red-100 text-red-800'
+                invoice.status === 'Paid'
+                  ? 'bg-emerald-100 text-emerald-800'
+                  : 'bg-red-100 text-red-800'
               }`}>
                 {invoice.status}
               </span>

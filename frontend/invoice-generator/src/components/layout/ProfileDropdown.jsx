@@ -44,20 +44,25 @@ const ProfileDropdown = ({
                 <p className="text-xs text-gray-500">{email}</p>
             </div>
 
-            <a
+            {/* Buttons, not anchors: an <a> with no href has no link role and is
+                not focusable, so these two items were unreachable by keyboard.
+                The old Sign out also carried href="#" with no preventDefault,
+                which rewrote the URL hash on the way out. */}
+            <button
+                type="button"
                 onClick={() => navigate('/profile')}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             >
                 View Profile
-            </a>
+            </button>
             <div className="border-t border-gray-100 mt-2 pt-2">
-                <a 
-                    href="#"
+                <button
+                    type="button"
                     onClick={onLogout}
-                    className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                 >
                     Sign out
-                </a>
+                </button>
             </div>
         </div>
     )}

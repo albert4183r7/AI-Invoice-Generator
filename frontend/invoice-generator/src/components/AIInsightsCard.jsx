@@ -13,7 +13,12 @@ const AIInsightsCard = () => {
         const response = await axiosInstance.get(
           API_PATHS.AI.GET_DASHBOARD_SUMMARY
         );
-        setInsights(response.data.insights || []);
+        // Having no invoices is not an error: the API answers 200 with a
+        // `summary` string instead of an `insights` array. Reading only
+        // `insights` threw that message away and left a new account looking at
+        // an empty card.
+        const { insights: list, summary } = response.data;
+        setInsights(list ?? (summary ? [summary] : []));
       } catch (error) {
   console.error("Failed to fetch AI insights", error);
         setInsights([]); // Set empty array on error
@@ -36,6 +41,10 @@ const AIInsightsCard = () => {
           <div className="h-4 bg-slate-200 rounded w-5/6"></div>
           <div className="h-4 bg-slate-200 rounded w-1/2"></div>
         </div>
+      ) : insights.length === 0 ? (
+        <p className="text-sm text-slate-500">
+          Insights are unavailable right now.
+        </p>
       ) : (
         <ul className="space-y-3 list-disc list-inside text-slate-600 ml-3">
           {insights.map((insight, index) => (

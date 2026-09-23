@@ -17,10 +17,10 @@ describe('Invoice Lifecycle Flow', () => {
       cy.url({ timeout: EXTENDED_TIMEOUT }).should('include', '/dashboard');
     }, {
       validate: () => {
-        cy.window().then((win) => {
-            const token = win.localStorage.getItem('token');
-            expect(token).to.be.a('string');
-        });
+        // The session is an httpOnly cookie now, so there is no localStorage
+        // token to inspect. cy.session restores cookies alongside storage, so
+        // this asks the API whether the restored session is actually valid.
+        cy.request('http://localhost:5000/api/auth/me').its('status').should('eq', 200);
       }
     });
   };

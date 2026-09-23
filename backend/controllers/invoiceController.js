@@ -1,11 +1,45 @@
-const Invoice = require("../models/Invoice");
+const Invoice = require('../models/Invoice');
+const logger = require('../logger');
+
+// protect() always attaches a full user document, so `_id` is present; the
+// fallback keeps these handlers working with the lightweight `{ id }` object
+// some tests build by hand.
+const userIdOf = (req) => req.user._id || req.user.id;
+
+// Turns a Mongoose cast/validation failure into a 400 instead of letting it
+// fall through to the generic 500. A malformed id or a status outside the
+// schema enum is the caller's mistake, not a server fault.
+const handleInvoiceError = (res, error, action) => {
+    if (error.name === 'CastError' || error.name === 'ValidationError') {
+        return res.status(400).json({ message: 'Invalid invoice data' });
+    }
+
+    logger.error({ err: error }, `failed to ${action} invoice`);
+    return res.status(500).json({ message: `Error ${action} invoice` });
+};
+
+// Shared by create and update: stamps each line's own total onto the item and
+// accumulates the invoice-level subtotal and tax.
+const calculateTotals = (items) => {
+    let subtotal = 0;
+    let taxTotal = 0;
+
+    const processedItems = items.map((item) => {
+        const itemTotal = item.unitPrice * item.quantity;
+        subtotal += itemTotal;
+        taxTotal += (itemTotal * (item.taxPercent || 0)) / 100;
+
+        return { ...item, total: itemTotal };
+    });
+
+    return { processedItems, subtotal, taxTotal, total: subtotal + taxTotal };
+};
 
 // @desc    Create new invoice
 // @route   POST /api/invoices
 // @access  Private
 exports.createInvoice = async (req, res) => {
     try {
-        const user = req.user;
         const {
             invoiceNumber,
             invoiceDate,
@@ -17,34 +51,20 @@ exports.createInvoice = async (req, res) => {
             paymentTerms,
         } = req.body;
 
-        // Calculate totals
-        let subtotal = 0;
-        let taxTotal = 0;
-        
-        // FIX: Map over items to calculate and ADD the 'total' field to each item object
-        const processedItems = items.map(item => {
-            const itemTotal = item.unitPrice * item.quantity;
-            const itemTax = (itemTotal * (item.taxPercent || 0)) / 100;
-            
-            subtotal += itemTotal;
-            taxTotal += itemTax;
+        if (!Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ message: 'An invoice needs at least one line item' });
+        }
 
-            return {
-                ...item,
-                total: itemTotal // Add the required total field
-            };
-        });
-
-        const total = subtotal + taxTotal;
+        const { processedItems, subtotal, taxTotal, total } = calculateTotals(items);
 
         const invoice = new Invoice({
-            user: user._id || user.id, // Ensure we extract the ID string
+            user: userIdOf(req),
             invoiceNumber,
             invoiceDate,
             dueDate,
             billFrom,
             billTo,
-            items: processedItems, // Use the processed items with totals
+            items: processedItems,
             notes,
             paymentTerms,
             subtotal,
@@ -55,7 +75,7 @@ exports.createInvoice = async (req, res) => {
         await invoice.save();
         res.status(201).json(invoice);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating invoice', error: error.message });
+        handleInvoiceError(res, error, 'creating');
     }
 };
 
@@ -64,12 +84,10 @@ exports.createInvoice = async (req, res) => {
 // @access  Private
 exports.getInvoices = async (req, res) => {
     try {
-        // Handle both _id (mongoose object) and id (JWT payload)
-        const userId = req.user._id || req.user.id;
-        const invoices = await Invoice.find({user: userId}).populate('user', 'name email');
+        const invoices = await Invoice.find({ user: userIdOf(req) }).populate('user', 'name email');
         res.json(invoices);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching invoices', error: error.message });
+        handleInvoiceError(res, error, 'fetching');
     }
 };
 
@@ -78,19 +96,22 @@ exports.getInvoices = async (req, res) => {
 // @access  Private
 exports.getInvoiceById = async (req, res) => {
     try {
-        const invoice = await Invoice.findById(req.params.id).populate('user', 'name email');
-        if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
-        
-        const userId = req.user._id || req.user.id;
-        
-        // Check if the invoice belongs to the user
-        if (invoice.user._id.toString() !== userId.toString()) {
-            return res.status(401).json({ message: 'Not Authorized' });
+        // Scoping the query by owner rather than loading first and comparing
+        // afterwards means another user's invoice is indistinguishable from one
+        // that does not exist -- no existence leak, and no way to forget the
+        // comparison.
+        const invoice = await Invoice.findOne({
+            _id: req.params.id,
+            user: userIdOf(req),
+        }).populate('user', 'name email');
+
+        if (!invoice) {
+            return res.status(404).json({ message: 'Invoice not found' });
         }
-        
+
         res.json(invoice);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching invoice', error: error.message });
+        handleInvoiceError(res, error, 'fetching');
     }
 };
 
@@ -99,6 +120,15 @@ exports.getInvoiceById = async (req, res) => {
 // @access  Private
 exports.updateInvoice = async (req, res) => {
     try {
+        const invoice = await Invoice.findOne({
+            _id: req.params.id,
+            user: userIdOf(req),
+        });
+
+        if (!invoice) {
+            return res.status(404).json({ message: 'Invoice not found' });
+        }
+
         const {
             invoiceNumber,
             invoiceDate,
@@ -111,49 +141,34 @@ exports.updateInvoice = async (req, res) => {
             status,
         } = req.body;
 
-        // Recalculate totals if items changed
-        let subtotal = 0;
-        let taxTotal = 0;
-        let processedItems = items;
+        // Apply only the fields actually present. The "Mark Paid" button sends
+        // nothing but `status`, and the previous all-fields-at-once write
+        // blanked the line items and reset the totals to 0 every time it ran.
+        if (invoiceNumber !== undefined) invoice.invoiceNumber = invoiceNumber;
+        if (invoiceDate !== undefined) invoice.invoiceDate = invoiceDate;
+        if (dueDate !== undefined) invoice.dueDate = dueDate;
+        if (billFrom !== undefined) invoice.billFrom = billFrom;
+        if (billTo !== undefined) invoice.billTo = billTo;
+        if (notes !== undefined) invoice.notes = notes;
+        if (paymentTerms !== undefined) invoice.paymentTerms = paymentTerms;
+        if (status !== undefined) invoice.status = status;
 
-        if (items && items.length > 0) {
-            processedItems = items.map(item => {
-                const itemTotal = item.unitPrice * item.quantity;
-                const itemTax = (itemTotal * (item.taxPercent || 0)) / 100;
-                
-                subtotal += itemTotal;
-                taxTotal += itemTax;
+        // Totals are only recomputed when the line items themselves change.
+        if (Array.isArray(items)) {
+            const { processedItems, subtotal, taxTotal, total } = calculateTotals(items);
 
-                return { ...item, total: itemTotal };
-            });
+            invoice.items = processedItems;
+            invoice.subtotal = subtotal;
+            invoice.taxTotal = taxTotal;
+            invoice.total = total;
         }
-        
-        const total = subtotal + taxTotal;
 
-        const updatedInvoice = await Invoice.findByIdAndUpdate(
-            req.params.id,
-            {
-                invoiceNumber,
-                invoiceDate,
-                dueDate,
-                billFrom,
-                billTo,
-                items: processedItems,
-                notes,
-                paymentTerms,
-                status,
-                subtotal,
-                taxTotal,
-                total,
-            },
-            { new: true }
-        );
-
-        if (!updatedInvoice) return res.status(404).json({ message: 'Invoice not found' });
-
+        // save() rather than findByIdAndUpdate so the schema's enum and
+        // required validators actually run on the new values.
+        const updatedInvoice = await invoice.save();
         res.json(updatedInvoice);
     } catch (error) {
-        res.status(500).json({ message: 'Error updating invoice', error: error.message });
+        handleInvoiceError(res, error, 'updating');
     }
 };
 
@@ -162,10 +177,17 @@ exports.updateInvoice = async (req, res) => {
 // @access  Private
 exports.deleteInvoice = async (req, res) => {
     try {
-        const invoice = await Invoice.findByIdAndDelete(req.params.id);
-        if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
+        const invoice = await Invoice.findOneAndDelete({
+            _id: req.params.id,
+            user: userIdOf(req),
+        });
+
+        if (!invoice) {
+            return res.status(404).json({ message: 'Invoice not found' });
+        }
+
         res.json({ message: 'Invoice deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting invoice', error: error.message });
+        handleInvoiceError(res, error, 'deleting');
     }
 };

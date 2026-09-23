@@ -35,6 +35,19 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
+      # mongodb-memory-server fetches a ~600 MB MongoDB binary the first time
+      # it runs. Without a cache, every CI run pays that download inside
+      # beforeAll -- so the suite is as slow as the network and fails outright
+      # whenever the fetch outlives Jest's timeout. Keyed on the lockfile so a
+      # dependency bump invalidates it.
+      - name: Cache MongoDB binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: ${{ runner.os }}-mongodb-binaries-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-mongodb-binaries-
+
       - name: Install dependencies
         run: npm ci
 

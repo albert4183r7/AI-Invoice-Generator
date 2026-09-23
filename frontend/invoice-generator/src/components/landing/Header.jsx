@@ -24,6 +24,16 @@ const Header = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // The avatar toggle calls stopPropagation, which only does anything if a
+    // document listener exists to be stopped. Without this the menu could only
+    // be closed by clicking the avatar a second time -- it stayed open while
+    // the user scrolled or clicked elsewhere on the page.
+    useEffect(() => {
+        const closeDropdown = () => setProfileDropdownOpen(false);
+        document.addEventListener("click", closeDropdown);
+        return () => document.removeEventListener("click", closeDropdown);
+    }, []);
+
     return (
         <header 
             className={`fixed top-0 w-full z-50 transition-all duration-300 bg-gray-100 ${
@@ -127,7 +137,6 @@ const Header = () => {
                         >
                             FAQ
                         </a>
-                        <div className=""></div>
                         {isAuthenticated ? (
                             <div className="pt-2 border-t border-gray-200">
                                 <Button

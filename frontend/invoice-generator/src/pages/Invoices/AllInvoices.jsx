@@ -104,8 +104,8 @@ const AllInvoices = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center itw-8 h-8 animate-spin text-blue-600">
-        <Loader2 className="" />
+      <div className="flex justify-center items-center py-16">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -177,9 +177,10 @@ const AllInvoices = () => {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
+                {/* Only the two statuses the API can actually store -- an
+                    option the backend enum forbids could never match. */}
                 <option value="All">All Statuses</option>
                 <option value="Paid">Paid</option>
-                <option value="Pending">Pending</option>
                 <option value="Unpaid">Unpaid</option>
               </select>
             </div>
@@ -220,9 +221,9 @@ const AllInvoices = () => {
                     <td onClick={() => navigate(`/invoices/${invoice._id}`)} className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 cursor-pointer">{moment(invoice.dueDate).format('MMM D, YYYY')}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        invoice.status === 'Paid' ? 'bg-emerald-100 text-emerald-800' : 
-                        invoice.status === 'Pending' ? 'bg-amber-100 text-amber-800' :
-                        'bg-red-100 text-red-800'
+                        invoice.status === 'Paid'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-red-100 text-red-800'
                       }`}>
                         {invoice.status}
                       </span>

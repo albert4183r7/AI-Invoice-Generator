@@ -1,26 +1,35 @@
 import { Link } from "react-router-dom";
 import { Twitter, Github, Linkedin, FileText } from "lucide-react";
+import ComingSoonLabel from "../ui/ComingSoonLabel";
 
-const FooterLink = ({ href, to, children }) => {
-  const className = "block text-gray-400 hover:text-white transition-colors duration-200";
-  if (to) {
-    return <Link to={to} className={className}>{children}</Link>;
-  }
-  return <a href={href} className={className}>{children}</a>;
-};
+// In-page anchors to the landing page's own sections.
+const FooterAnchor = ({ href, children }) => (
+  <a
+    href={href}
+    className="block text-gray-400 hover:text-white transition-colors duration-200"
+  >
+    {children}
+  </a>
+);
 
-const SocialLink = ({ href, children }) => {
-  return (
-    <a
-      href={href}
-      className="w-10 h-10 bg-blue-950 rounded-lg flex items-center justify-center hover:opacity-90 transition duration-200"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {children}
-    </a>
-  );
-};
+// Routes that do not exist yet. They stay listed so the intended footer is
+// visible, but they are not rendered as links that bounce back to the landing
+// page via the catch-all route.
+const FooterPending = ({ children }) => (
+  <ComingSoonLabel className="text-sm">{children}</ComingSoonLabel>
+);
+
+// No social accounts exist for this project yet, so these render as inert
+// badges rather than anchors pointing at "#".
+const SocialIcon = ({ label, children }) => (
+  <span
+    className="w-10 h-10 bg-blue-950 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed"
+    title={`${label} — coming soon`}
+    aria-disabled="true"
+  >
+    {children}
+  </span>
+);
 
 const Footer = () => {
   return (
@@ -42,50 +51,46 @@ const Footer = () => {
             <h3 className="text-base font-semibold mb-4">Product</h3>
             <ul className="space-y-2">
               <li>
-                <FooterLink href="#features">Features</FooterLink>
+                <FooterAnchor href="#features">Features</FooterAnchor>
               </li>
               <li>
-                <FooterLink href="#testimonials">Testimonials</FooterLink>
+                <FooterAnchor href="#testimonials">Testimonials</FooterAnchor>
               </li>
               <li>
-                <FooterLink href="#faq">FAQ</FooterLink>
+                <FooterAnchor href="#faq">FAQ</FooterAnchor>
               </li>
             </ul>
           </div>
           <div>
             <h3 className="text-base font-semibold mb-4">Company</h3>
             <ul className="space-y-2">
-              <li><FooterLink to="/about">About Us</FooterLink></li>
-              <li><FooterLink to="/contact">Contact</FooterLink></li>
+              <li><FooterPending>About Us</FooterPending></li>
+              <li><FooterPending>Contact</FooterPending></li>
             </ul>
           </div>
           <div>
             <h3 className="text-base font-semibold mb-4">Legal</h3>
             <ul className="space-y-2">
-              <li>
-                <FooterLink to="/privacy">Privacy Policy</FooterLink>
-              </li>
-              <li>
-                <FooterLink to="/terms">Terms of Service</FooterLink>
-              </li>
+              <li><FooterPending>Privacy Policy</FooterPending></li>
+              <li><FooterPending>Terms of Service</FooterPending></li>
             </ul>
           </div>
         </div>
         <div className="border-t border-gray-800 py-8 mt-16">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400">
-              &copy; 2025 PromptBill. All rights reserved.
+              &copy; {new Date().getFullYear()} PromptBill. All rights reserved.
             </p>
             <div className="flex space-x-4">
-              <SocialLink href="#">
+              <SocialIcon label="Twitter">
                 <Twitter className="w-5 h-5" />
-              </SocialLink>
-              <SocialLink href="#">
+              </SocialIcon>
+              <SocialIcon label="GitHub">
                 <Github className="w-5 h-5" />
-              </SocialLink>
-              <SocialLink href="#">
+              </SocialIcon>
+              <SocialIcon label="LinkedIn">
                 <Linkedin className="w-5 h-5" />
-              </SocialLink>
+              </SocialIcon>
             </div>
           </div>
         </div>
@@ -94,4 +99,4 @@ const Footer = () => {
   )
 }
 
-export default Footer
+export default Footer;

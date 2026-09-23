@@ -14,6 +14,7 @@ import { useAuth } from "../../context/AuthContext";
 import axiosInstance from "../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { validateEmail, validatePassword } from "../../utils/helper";
+import ComingSoonLabel from "../../components/ui/ComingSoonLabel";
 
 
 const SignUp = () => {
@@ -181,7 +182,6 @@ const SignUp = () => {
         }
       );
       const data = response.data;
-      const { token } = data;
 
       if (response.status === 201) {
         setSuccess("Account created successfully");
@@ -201,8 +201,9 @@ const SignUp = () => {
           confirmPassword: false,
         });
 
-        // Login the user immediately after successful registration
-        login(data, token);
+        // Log the user in immediately. The register response already carried
+        // the session cookie, so there is nothing to store client-side.
+        login(data);
         navigate("/dashboard");
       }
       
@@ -376,28 +377,24 @@ const SignUp = () => {
           )}
 
           {success && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-green-600 text-sm">{success}</p>
             </div>
           )}
 
-          {/* Terms & Conditions */}
+          {/* Terms & Conditions.
+              The two policy pages do not exist yet, so the labels are marked
+              rather than rendered as links that go nowhere. */}
           <div className="flex items-start pt-2">
             <input
               type="checkbox"
               id="terms"
               className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black mt-1"
-              required
             />
             <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
               I agree to the{" "}
-              <button className="text-black hover:underline">
-                Terms of Service
-              </button>{" "}
-              and{" "}
-              <button className="text-black hover:underline">
-                Privacy Policy
-              </button>
+              <ComingSoonLabel>Terms of Service</ComingSoonLabel> and{" "}
+              <ComingSoonLabel>Privacy Policy</ComingSoonLabel>
             </label>
           </div>
 
@@ -409,7 +406,7 @@ const SignUp = () => {
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-w mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Creating account...
               </>
             ) : (

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Briefcase, LogOut, Menu, X } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import ProfileDropdown from "./ProfileDropdown";
 import { NAVIGATION_MENU } from "../../utils/data";
@@ -25,14 +25,25 @@ const NavigationItem = ({ item, isActive, onClick, isCollapsed }) => {
     </button>
 };
 
-const DashboardLayout = ({ children, activeMenu }) => {
+const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeNavItem, setActiveNavItem] = useState(activeMenu || "dashboard");
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Derived from the URL rather than held in state. Tracking it in state meant
+  // the highlight only ever moved when the sidebar itself was clicked, so a
+  // deep link or an in-page navigation left the wrong item selected. Longest
+  // matching id wins, so /invoices/new highlights "Create Invoice" rather than
+  // "Invoices".
+  const currentPath = location.pathname.replace(/^\//, "");
+  const activeNavItem =
+    NAVIGATION_MENU
+      .filter((item) => currentPath === item.id || currentPath.startsWith(`${item.id}/`))
+      .sort((a, b) => b.id.length - a.id.length)[0]?.id || "dashboard";
 
   // Handle responsive behavior
   useEffect(() => {
@@ -65,7 +76,6 @@ const DashboardLayout = ({ children, activeMenu }) => {
   }, [profileDropdownOpen]);
 
   const handleNavigation = (itemId) => {
-    setActiveNavItem(itemId);
     navigate(`/${itemId}`);
     if (isMobile) {
       setSidebarOpen(false);
@@ -135,7 +145,7 @@ const DashboardLayout = ({ children, activeMenu }) => {
       {/* Mobile overlay */}
       {isMobile && sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/10 bg-opacity-25 z-40 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/25 z-40 backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}

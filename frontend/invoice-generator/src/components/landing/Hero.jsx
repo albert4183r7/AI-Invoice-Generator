@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext"
 
 const Hero = () => {
     const { isAuthenticated } = useAuth();
-    
+
     return <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
@@ -17,23 +17,26 @@ const Hero = () => {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
                     {isAuthenticated ? (
-                        <Link to= "/dashboard" className="bg-gradient-to-r from-blue-950 to-blue-900 text-white px-8 py-4 rounded-2xl font-bold text-base sm:text-lg hover:opacity-95 transition-all duration-200 hover:scale-102 hover:shadow-2xl transform">
+                        <Link to= "/dashboard" className="bg-gradient-to-r from-blue-950 to-blue-900 text-white px-8 py-4 rounded-2xl font-bold text-base sm:text-lg hover:opacity-95 transition-all duration-200 hover:scale-105 hover:shadow-2xl transform">
                             Go to Dashboard
                         </Link>
                     ) : (
-                        <Link to="/signup" className="bg-gradient-to-r from-blue-950 to-blue-900 text-white px-8 py-4 rounded-2xl font-bold text-base sm:text-lg hover:opacity-95 transition-all duration-200 hover:scale-102 hover:shadow-2xl transform">
+                        <Link to="/signup" className="bg-gradient-to-r from-blue-950 to-blue-900 text-white px-8 py-4 rounded-2xl font-bold text-base sm:text-lg hover:opacity-95 transition-all duration-200 hover:scale-105 hover:shadow-2xl transform">
                             Get Started for Free
                         </Link>
                     )}
-                    <a href="#features" className="border-2 border-slate-200 text-primary-900 px-8 py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-white hover:text-primary-900 transition-all duration-200 hover:scale-102">
+                    {/* `text-primary` is the brand accent defined in index.css;
+                        `text-primary-900` named a shade that does not exist,
+                        so the declared token was never actually applied. */}
+                    <a href="#features" className="border-2 border-slate-200 text-primary px-8 py-4 rounded-2xl font-bold text-base sm:text-lg hover:border-primary hover:bg-orange-50 transition-all duration-200 hover:scale-105">
                         Learn More
                     </a>
                 </div>
             </div>
             <div className="mt-12 sm:mt-16 relative max-w-4xl mx-auto">
-                <img 
-                    src={HERO_IMG} 
-                    alt="AI Invoice Generator" 
+                <img
+                    src={HERO_IMG}
+                    alt="AI Invoice Generator"
                     className="w-full h-auto rounded-lg shadow-lg"
                 />
             </div>
