@@ -182,9 +182,7 @@ startup.
 
 ```
 .
-├── .github/
-│   ├── workflows/           CI and image-publishing pipelines
-│   └── pull_request_template.md
+├── .github/workflows/       CI and image-publishing pipelines
 ├── monitoring/
 │   ├── prometheus/          Scrape configuration
 │   └── grafana/             Datasource, dashboard provider, dashboard JSON
@@ -207,36 +205,6 @@ startup.
 │   └── Dockerfile           Multi-stage build -> unprivileged nginx
 └── docker-compose.yml
 ```
-
----
-
-## Limitations and roadmap
-
-Honest list of what this repository does **not** yet do:
-
-- **No infrastructure as code, and nothing deployed to AWS yet.** This project targets AWS, but
-  deployment is still Docker Compose on a local machine: there is no Terraform, no Kubernetes
-  manifests, and images are published to GHCR rather than ECR.
-- **No automated dependency updates or image scanning.** Dependabot is not configured, so npm
-  dependencies, Docker base images and the Actions used by the pipeline are all bumped by hand,
-  and nothing blocks a merge on a newly disclosed CVE.
-- **No alerting.** The metrics and the dashboard exist, but nothing fires when the error rate
-  climbs. There is no Alertmanager configuration, and no SLO written down with an error budget
-  attached to it — so there is no defined point at which a release should be held back.
-- **No runbook or postmortem.** Nothing documents what to do when the API starts returning 5xx,
-  which is the artifact that separates "I built monitoring" from "I have been on call".
-- **`/metrics` is unauthenticated** and, under Compose, published to the host. In a real deployment
-  it belongs on an internal network or behind authentication.
-- **AI controller errors leak `error.message`** into 500 responses via the `details` field, which
-  can expose upstream provider detail to clients.
-- **Compose needs an external database.** There is no MongoDB service, so `docker compose up`
-  requires a reachable `MONGO_URI` before the API reports ready.
-
----
-
-## License
-
-Released under the [MIT License](LICENSE).
 
 ---
 
@@ -270,3 +238,9 @@ Released under the [MIT License](LICENSE).
 - **Final Details:** Invoice detail page, print/download PDF, profile page for business details.
 
 </details>
+
+---
+
+## License
+
+Released under the [MIT License](LICENSE).
